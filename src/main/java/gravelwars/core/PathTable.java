@@ -1,7 +1,6 @@
-package gravelwars;
+package gravelwars.core;
 
 public class PathTable {
-
 
 
 }

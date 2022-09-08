@@ -4,7 +4,28 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7dfb8d58-7811-493f-b783-28e31d1f9c3a" name="Changes" comment="Initial implementation of most base classes before adding networking and pathfinding." />
+    <list default="true" id="7dfb8d58-7811-493f-b783-28e31d1f9c3a" name="Changes" comment="Initial implementation of most base classes before adding networking and pathfinding.">
+      <change afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/MapData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/MapDataLocal.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/MapNode.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/MapRoad.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/Mercenaries.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/Player.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/Coordinates.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/Coordinates.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/Enums.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/Enums.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/GravelWarsWebsocketServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gravelwars/networking/GravelWarsWebsocketServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gravelwars/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/MapManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/MapManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/MapNode.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/MapRoad.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/MercSquad.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/PathTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/PathTable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/Player.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/TFTcpServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gravelwars/networking/TFTcpServer.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -39,17 +60,17 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.sourceCode.Java&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="Main" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="gravelwars.Main" />
@@ -95,7 +116,14 @@
       <option name="project" value="LOCAL" />
       <updated>1660159109046</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Initial implementation of most base classes before adding networking and pathfinding.">
+      <created>1660159269240</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1660159269240</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

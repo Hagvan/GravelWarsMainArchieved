@@ -1,7 +1,4 @@
-package gravelwars;
-
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
+package gravelwars.networking;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;

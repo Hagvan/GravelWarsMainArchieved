@@ -1,4 +1,4 @@
-package gravelwars;
+package gravelwars.core;
 
 public class Enums {
 

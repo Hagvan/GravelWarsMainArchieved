@@ -1,4 +1,4 @@
-package gravelwars;
+package gravelwars.core;
 
 public class Coordinates {
 
@@ -10,7 +10,7 @@ public class Coordinates {
         this.y = y;
     }
 
-    public int GetDistance(Coordinates other) {
+    public int getDistance(Coordinates other) {
         return (int) Math.round(Math.sqrt(Math.pow(x, 2) - Math.pow(y, 2)));
     }
 }
