@@ -26,6 +26,11 @@ public class MapRoad {
         length = node1.getPosition().getDistance(node2.getPosition());
     }
 
+    public void init() {
+        node1 = MapManager.getNodeById(node1Id);
+        node2 = MapManager.getNodeById(node2Id);
+    }
+
     public void addSquad(Mercenaries squad, MapNode from) {
         if (from == node1) {
             node1ToNode2.add(squad);

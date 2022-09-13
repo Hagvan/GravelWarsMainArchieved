@@ -28,6 +28,13 @@ public class MapNode {
         roads = new HashMap<>();
     }
 
+    public void init() {
+        roads = new HashMap<>();
+        for (Integer roadId : roadsById) {
+            roads.put(roadId, MapManager.getRoadById(roadId));
+        }
+    }
+
     public void addRoad(MapRoad road) {
         if (!roads.containsKey(road.getId())) {
             roadsById.add(road.getId());
@@ -71,5 +78,11 @@ public class MapNode {
         return id;
     }
 
+    public ArrayList<Integer> getRoadsById() {
+        return roadsById;
+    }
 
+    public void setRoadsById(ArrayList<Integer> roadsById) {
+        this.roadsById = roadsById;
+    }
 }

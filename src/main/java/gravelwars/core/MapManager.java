@@ -4,18 +4,40 @@ import com.google.gson.Gson;
 
 import java.io.*;
 import java.nio.file.*;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 
-public class MapManager {
+public abstract class MapManager {
 
     private static final Path gravelwarsPath = Path.of("gravel-wars.json");
     private static MapDataLocal data;
+    private static final Timer worldTimer = new Timer();
 
-    public static void initMap() {
+    public static void init() {
         // load from JSON or some other format to create the map
         // first should load all nodes and then load all the roads creating connections
         // then generate path routes
+        load();
+        for (MapNode node : data.getNodes().values()) {
+            node.init();
+        }
+        for (MapRoad road : data.getRoads().values()) {
+            road.init();
+        }
+        worldTimer.scheduleAtFixedRate(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        tick();
+                    }
+                }, 1000, 1000);
+    }
+
+    public static void stop() {
+        worldTimer.cancel();
+        save();
+    }
+
+    private static void load() {
         Gson gson = new Gson();
         try (Reader reader = Files.newBufferedReader(gravelwarsPath)) {
             data = gson.fromJson(reader, MapDataLocal.class);
@@ -26,6 +48,10 @@ public class MapManager {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private static void save() {
+        Gson gson = new Gson();
         try (Writer writer = Files.newBufferedWriter(gravelwarsPath)) {
             String bussing = gson.toJson(data);
             System.out.println(bussing.length());
@@ -56,6 +82,14 @@ public class MapManager {
                 createRoad(generatedNodes[i], generatedNodes[i + j + 1]);
             }
         }
+    }
+
+    public static MapNode getNodeById(int nodeId) {
+        return data.getNodes().get(nodeId);
+    }
+
+    public static MapRoad getRoadById(int roadId) {
+        return data.getRoads().get(roadId);
     }
 
     private static MapNode createNode(int posX, int posY, String map) {
@@ -114,6 +148,10 @@ public class MapManager {
     public static void moveSquad(Mercenaries squad, MapRoad road, MapNode node) { // road -> node
         road.removeSquad(squad);
         node.addSquad(squad);
+    }
+
+    private static void tick() {
+
     }
 
 }
