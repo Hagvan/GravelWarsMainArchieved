@@ -1,7 +1,6 @@
 package gravelwars.core;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 public class MapNode {
 
@@ -16,6 +15,7 @@ public class MapNode {
     private ArrayList<Integer> roadsById;
     private transient HashMap<Integer, MapRoad> roads; // avoid circular reference
     private int influence; // -100 = fully controlled by BLU, 100 - fully controlled by RED
+    private transient HashMap<Integer, MapRoad> pathMap;
 
     public MapNode(int id, int posX, int posY, String mapName) {
         this.id = id;
@@ -33,6 +33,10 @@ public class MapNode {
         for (Integer roadId : roadsById) {
             roads.put(roadId, MapManager.getRoadById(roadId));
         }
+    }
+
+    public void setPathMap(HashMap<Integer, MapRoad> pathMap) {
+        this.pathMap = pathMap;
     }
 
     public void addRoad(MapRoad road) {
@@ -70,8 +74,35 @@ public class MapNode {
         return position;
     }
 
-    public void tick() {
+    public String getMapName() {
+        return mapName;
+    }
 
+    public HashMap<Integer, MapRoad> getRoads() {
+        return roads;
+    }
+
+    public int getInfluence() {
+        return influence;
+    }
+
+    public void tick() {
+        for (Mercenaries squad : redSquads.values()) {
+            if (squad.getDestinationNodeId() == id) {
+                continue;
+            }
+            if (squad.tick() == 10) {
+                MapManager.moveSquad(squad, this, pathMap.get(squad.getDestinationNodeId()));
+            }
+        }
+        for (Mercenaries squad : blueSquads.values()) {
+            if (squad.getDestinationNodeId() == id) {
+                continue;
+            }
+            if (squad.tick() == 10) {
+                MapManager.moveSquad(squad, this, pathMap.get(squad.getDestinationNodeId()));
+            }
+        }
     }
 
     public int getId() {
@@ -84,5 +115,13 @@ public class MapNode {
 
     public void setRoadsById(ArrayList<Integer> roadsById) {
         this.roadsById = roadsById;
+    }
+
+    public void setCapital(Enums.TFTeam team) {
+        switch (team) {
+            case UNASSIGNED -> influence = 0;
+            case RED -> influence = MAX_INFLUENCE;
+            case BLUE -> influence = MIN_INFLUENCE;
+        }
     }
 }

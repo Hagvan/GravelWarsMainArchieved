@@ -8,8 +8,8 @@ public class Mercenaries {
     private int spawns;
     private Enums.TFClass mercenariesClass;
     private Player player;
-
     private int destinationNodeId; // avoid circular reference
+    private int moveProgress;
 
     public Mercenaries(int id, Player player, Enums.TFClass mercenariesClass) {
         this.id = id;
@@ -40,5 +40,21 @@ public class Mercenaries {
 
     public Enums.TFTeam getTeam() {
         return player.getTeam();
+    }
+
+    public int tick() {
+        return moveProgress++;
+    }
+
+    public void resetMoveProgress() {
+        moveProgress = 0;
+    }
+
+    public int getDestinationNodeId() {
+        return destinationNodeId;
+    }
+
+    public void setDestinationNodeId(int nodeId) {
+        destinationNodeId = nodeId;
     }
 }

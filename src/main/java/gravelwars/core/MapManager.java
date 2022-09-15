@@ -11,6 +11,7 @@ public abstract class MapManager {
     private static final Path gravelwarsPath = Path.of("gravel-wars.json");
     private static MapDataLocal data;
     private static final Timer worldTimer = new Timer();
+    private final static LinkedList<MoveSquadOrder> moveSquadOrders = new LinkedList<>();
 
     public static void init() {
         // load from JSON or some other format to create the map
@@ -23,13 +24,89 @@ public abstract class MapManager {
         for (MapRoad road : data.getRoads().values()) {
             road.init();
         }
+        // generate the paths after the map is fully loaded
+        generatePaths();
         worldTimer.scheduleAtFixedRate(
                 new TimerTask() {
                     @Override
                     public void run() {
                         tick();
                     }
-                }, 1000, 1000);
+                }, 100, 100);
+    }
+
+    private static void generatePaths() {
+        HashMap<Integer, DijkstraTableRow> sampleRows = new HashMap<>();
+        for (Map.Entry<Integer, MapNode> entry : data.getNodes().entrySet()) {
+            sampleRows.put(entry.getKey(), new DijkstraTableRow(entry.getValue()));
+        }
+        for (Map.Entry<Integer, MapNode> entry : data.getNodes().entrySet()) {
+            HashMap<Integer, MapRoad> resultForNode = new HashMap<>();
+            HashMap<Integer, DijkstraTableRow> rows = new HashMap<>(sampleRows);
+            ArrayList<DijkstraTableRow> visited = new ArrayList<>();
+            ArrayList<DijkstraTableRow> unvisited = new ArrayList<>(sampleRows.values());
+            MapNode startNode = entry.getValue();
+            DijkstraTableRow startRow = rows.get(startNode.getId());
+            for (DijkstraTableRow row : rows.values()) {
+                row.distance = Integer.MAX_VALUE;
+            }
+            startRow.distance = 0;
+            while (unvisited.size() > 0) {
+                DijkstraTableRow currentRow = unvisited.stream().min(Comparator.comparingInt(DijkstraTableRow::getDistance)).get();
+                MapNode currentNode = currentRow.node;
+                for (MapRoad road : currentNode.getRoads().values()) {
+                    MapNode neighborNode;
+                    if (road.getNode1() == currentNode) {
+                        neighborNode = road.getNode2();
+                    } else {
+                        neighborNode = road.getNode1();
+                    }
+                    DijkstraTableRow neighborRow = rows.get(neighborNode.getId());
+                    if (visited.contains(neighborRow)) { // avoid going to a visited node while checking neighbors
+                        continue;
+                    }
+                    int distanceToNeighbor = currentRow.distance + road.getLength();
+                    DijkstraTableRow neighborNodeRow = rows.get(neighborNode.getId());
+                    if (neighborNodeRow.distance > distanceToNeighbor) {
+                        if (currentNode != startNode) {
+                            distanceToNeighbor += 10; // adding the delay of passing through a node
+                        }
+                        neighborNodeRow.distance = distanceToNeighbor;
+                        neighborNodeRow.previousNode = currentNode;
+                        neighborNodeRow.previousRoad = road;
+                    }
+                }
+                visited.add(rows.get(currentNode.getId()));
+                unvisited.remove(rows.get(currentNode.getId()));
+                if (currentNode == startNode) {
+                    continue; // prevent starting node from being added to the result hashmap
+                }
+                DijkstraTableRow backtrackRow = currentRow; // backtrack to one of the roads originating from the startNode
+                while (backtrackRow.previousNode != startNode) {
+                    backtrackRow = rows.get(backtrackRow.previousNode.getId());
+                }
+                resultForNode.put(currentNode.getId(), backtrackRow.previousRoad); // put the current road
+            }
+            entry.getValue().setPathMap(resultForNode);
+        }
+    }
+
+    private static class DijkstraTableRow {
+        public MapNode node;
+        public int distance;
+        public MapNode previousNode;
+        public MapRoad previousRoad;
+
+        public DijkstraTableRow(MapNode node) {
+            this.node = node;
+            distance = Integer.MAX_VALUE;
+            previousNode = null;
+            previousRoad = null;
+        }
+
+        public int getDistance() {
+            return distance;
+        }
     }
 
     public static void stop() {
@@ -62,7 +139,7 @@ public abstract class MapManager {
     }
 
     private static void generateWorld() {
-        data = new MapDataLocal(new HashMap<>(), new HashMap<>(), 0, 0, 0);
+        data = new MapDataLocal(new LinkedHashMap<>(), new LinkedHashMap<>(), 0, 0, 0);
         Random rng = new Random();
         int nodeCount = Math.floorMod(rng.nextInt(), 31) + 10;
         MapNode[] generatedNodes = new MapNode[nodeCount];
@@ -82,6 +159,10 @@ public abstract class MapManager {
                 createRoad(generatedNodes[i], generatedNodes[i + j + 1]);
             }
         }
+        int redCapital = Math.floorMod(rng.nextInt(), nodeCount);
+        int blueCapital = Math.max(0, nodeCount - redCapital);
+        data.addCapital(getNodeById(redCapital), Enums.TFTeam.RED);
+        data.addCapital(getNodeById(blueCapital), Enums.TFTeam.BLUE);
     }
 
     public static MapNode getNodeById(int nodeId) {
@@ -112,6 +193,14 @@ public abstract class MapManager {
         int squadIndex = data.getSquadIndex();
         Mercenaries mercenaries = new Mercenaries(squadIndex, player, mercenariesClass);
         data.setSquadIndex(squadIndex + 1);
+        switch (player.getTeam()) {
+            case RED -> {
+                getNodeById(data.getRedCapitalNodes().get(0)).addSquad(mercenaries);
+            }
+            case BLUE -> {
+                getNodeById(data.getBlueCapitalNodes().get(0)).addSquad(mercenaries);
+            }
+        }
         return mercenaries;
     }
 
@@ -141,17 +230,36 @@ public abstract class MapManager {
     }
 
     public static void moveSquad(Mercenaries squad, MapNode node, MapRoad road) { // node -> road
-        node.removeSquad(squad);
-        road.addSquad(squad, node);
+        moveSquadOrders.add(new MoveSquadOrder(squad, node, road));
     }
 
     public static void moveSquad(Mercenaries squad, MapRoad road, MapNode node) { // road -> node
-        road.removeSquad(squad);
-        node.addSquad(squad);
+        moveSquadOrders.add(new MoveSquadOrder(squad, road, node));
+    }
+
+    private static void commitMoves() {
+        for (MoveSquadOrder order : moveSquadOrders) {
+            if (order.isNodeToRoad()) {
+                order.getNode().removeSquad(order.getSquad());
+                order.getRoad().addSquad(order.getSquad(), order.getNode());
+                order.getSquad().resetMoveProgress();
+            } else {
+                order.getRoad().removeSquad(order.getSquad());
+                order.getNode().addSquad(order.getSquad());
+                order.getSquad().resetMoveProgress();
+            }
+        }
+        moveSquadOrders.clear();
     }
 
     private static void tick() {
-
+        for (MapRoad road : data.getRoads().values()) {
+            road.tick();
+        }
+        for (MapNode node : data.getNodes().values()) {
+            node.tick();
+        }
+        commitMoves();
     }
 
 }

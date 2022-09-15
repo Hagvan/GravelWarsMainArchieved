@@ -27,6 +27,10 @@ public class Player {
         return true;
     }
 
+    public void setMoney(int money) {
+        this.money = money;
+    }
+
     public void spendMoney(int amount) {
         money -= amount;
     }
@@ -36,7 +40,7 @@ public class Player {
     }
 
     public boolean createSquad(Enums.TFClass mercenaryClass) {
-        if (squadCount == MAX_MERCENARY_SQUADS || canAfford(100)) { // arbitrary squad creating cost
+        if (squadCount == MAX_MERCENARY_SQUADS || !canAfford(100)) { // arbitrary squad creating cost
             return false;
         }
         mercenaries[squadCount] = MapManager.createSquad(this, mercenaryClass);
@@ -54,4 +58,7 @@ public class Player {
         // will find the destination and assign it inside squad
     }
 
+    public void setTeam(Enums.TFTeam team) {
+        this.team = team;
+    }
 }

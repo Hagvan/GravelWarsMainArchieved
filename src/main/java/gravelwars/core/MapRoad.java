@@ -5,7 +5,7 @@ import java.util.LinkedList;
 public class MapRoad {
 
     private int id;
-    private int length;
+    private final int length;
     private int node1Id; // avoid circular reference
     private transient MapNode node1;
     private int node2Id; // avoid circular reference
@@ -44,12 +44,33 @@ public class MapRoad {
         node2ToNode1.remove(squad);
     }
 
+    public MapNode getNode1() {
+        return node1;
+    }
+
+    public MapNode getNode2() {
+        return node2;
+    }
+
     public int getId() {
         return id;
     }
 
-    public void tick() {
+    public int getLength() {
+        return length;
+    }
 
+    public void tick() {
+        for (Mercenaries squad : node1ToNode2) {
+            if (squad.tick() == length) {
+                MapManager.moveSquad(squad, this, node2);
+            }
+        }
+        for (Mercenaries squad : node2ToNode1) {
+            if (squad.tick() == length) {
+                MapManager.moveSquad(squad, this, node1);
+            }
+        }
     }
 
 }
