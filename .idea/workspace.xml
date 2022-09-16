@@ -4,16 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7dfb8d58-7811-493f-b783-28e31d1f9c3a" name="Changes" comment="Implemented Mercenaries.java movement using the tick() method which goes from MapManager.java timer. Using dijkstra path finding algorithm for pathfinding.">
-      <change afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/MoveSquadOrder.java" afterDir="false" />
+    <list default="true" id="7dfb8d58-7811-493f-b783-28e31d1f9c3a" name="Changes" comment="Implemented Mercenaries.java movement using the tick() method which goes from MapManager.java timer. Using dijkstra path finding algorithm for pathfinding.&#10;Implemented basic capital nodes where Mercenaries can be spawned.&#10;TODO: Create a proper unit test for Mercenaries movement through the map.&#10;TODO: Polish Player.java and everything related to Mercenaries creation and management.">
+      <change afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/data/GameData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/managers/GameManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gravelwars/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/core/MapDataLocal.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/MapDataLocal.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/core/MapManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/MapManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/core/MapNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/MapNode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/core/MapRoad.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/MapRoad.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/core/Mercenaries.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/Mercenaries.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/core/PathTable.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/core/Coordinates.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/map/Coordinates.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/core/MapData.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/core/MapDataLocal.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/data/MapData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/core/MapManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/managers/MapManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/core/MapNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/map/MapNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/core/MapRoad.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/map/MapRoad.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/core/Mercenaries.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/map/Mercenaries.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/core/MoveSquadOrder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/MoveSquadOrder.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/gravelwars/core/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gravelwars/core/Player.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -29,6 +32,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="JUnit5 Test Class" />
+        <option value="Interface" />
         <option value="Class" />
       </list>
     </option>
@@ -55,12 +60,22 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary&quot;: &quot;JUnit5&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5&quot;: &quot;&quot;,
     &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.sourceCode.Java&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="gravelwars.core" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="Main" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="gravelwars.Main" />
@@ -120,7 +135,14 @@
       <option name="project" value="LOCAL" />
       <updated>1663082385381</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Implemented Mercenaries.java movement using the tick() method which goes from MapManager.java timer. Using dijkstra path finding algorithm for pathfinding.&#10;Implemented basic capital nodes where Mercenaries can be spawned.&#10;TODO: Create a proper unit test for Mercenaries movement through the map.&#10;TODO: Polish Player.java and everything related to Mercenaries creation and management.">
+      <created>1663214797122</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1663214797122</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -150,13 +172,18 @@
     <MESSAGE value="Initial commit." />
     <MESSAGE value="Initial implementation of most base classes before adding networking and pathfinding." />
     <MESSAGE value="Finished implementing serialization to the hard drive in json format and loading the save back into the system + relinking all the references using init()." />
-    <option name="LAST_COMMIT_MESSAGE" value="Finished implementing serialization to the hard drive in json format and loading the save back into the system + relinking all the references using init()." />
+    <MESSAGE value="Implemented Mercenaries.java movement using the tick() method which goes from MapManager.java timer. Using dijkstra path finding algorithm for pathfinding.&#10;Implemented basic capital nodes where Mercenaries can be spawned.&#10;TODO: Create a proper unit test for Mercenaries movement through the map.&#10;TODO: Polish Player.java and everything related to Mercenaries creation and management." />
+    <option name="LAST_COMMIT_MESSAGE" value="Implemented Mercenaries.java movement using the tick() method which goes from MapManager.java timer. Using dijkstra path finding algorithm for pathfinding.&#10;Implemented basic capital nodes where Mercenaries can be spawned.&#10;TODO: Create a proper unit test for Mercenaries movement through the map.&#10;TODO: Polish Player.java and everything related to Mercenaries creation and management." />
   </component>
   <component name="XDebuggerManager">
-    <watches-manager>
-      <configuration name="GradleRunConfiguration">
-        <watch expression="MapManager.data" />
-      </configuration>
-    </watches-manager>
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/gravelwars/core/managers/GameManager.java</url>
+          <line>31</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

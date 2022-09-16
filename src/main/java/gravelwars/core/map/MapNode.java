@@ -1,4 +1,7 @@
-package gravelwars.core;
+package gravelwars.core.map;
+
+import gravelwars.core.Enums;
+import gravelwars.core.managers.MapManager;
 
 import java.util.*;
 
@@ -123,5 +126,13 @@ public class MapNode {
             case RED -> influence = MAX_INFLUENCE;
             case BLUE -> influence = MIN_INFLUENCE;
         }
+    }
+
+    public HashMap<Integer, Mercenaries> getRedSquads() {
+        return redSquads;
+    }
+
+    public HashMap<Integer, Mercenaries> getBlueSquads() {
+        return blueSquads;
     }
 }

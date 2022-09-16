@@ -1,4 +1,6 @@
-package gravelwars.core;
+package gravelwars.core.map;
+
+import gravelwars.core.managers.MapManager;
 
 import java.util.LinkedList;
 
@@ -73,4 +75,11 @@ public class MapRoad {
         }
     }
 
+    public LinkedList<Mercenaries> getNode1ToNode2() {
+        return node1ToNode2;
+    }
+
+    public LinkedList<Mercenaries> getNode2ToNode1() {
+        return node2ToNode1;
+    }
 }

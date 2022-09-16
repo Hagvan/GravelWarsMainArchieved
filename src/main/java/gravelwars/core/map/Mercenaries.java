@@ -1,4 +1,7 @@
-package gravelwars.core;
+package gravelwars.core.map;
+
+import gravelwars.core.Enums;
+import gravelwars.core.Player;
 
 public class Mercenaries {
 
@@ -7,13 +10,19 @@ public class Mercenaries {
     private int id;
     private int spawns;
     private Enums.TFClass mercenariesClass;
-    private Player player;
+    private int playerId;
+    private Enums.TFTeam team;
+    private transient Player player;
+    private transient MapNode currentNode;
+    private transient MapRoad currentRoad;
     private int destinationNodeId; // avoid circular reference
     private int moveProgress;
 
     public Mercenaries(int id, Player player, Enums.TFClass mercenariesClass) {
         this.id = id;
         this.player = player;
+        playerId = player.getSteamId();
+        team = player.getTeam();
         this.mercenariesClass = mercenariesClass;
         spawns = MIN_SPAWNS;
     }
@@ -39,11 +48,15 @@ public class Mercenaries {
     }
 
     public Enums.TFTeam getTeam() {
-        return player.getTeam();
+        return team;
     }
 
     public int tick() {
         return moveProgress++;
+    }
+
+    public boolean canReinforce(int count) {
+        return spawns + count <= MAX_SPAWNS;
     }
 
     public void resetMoveProgress() {
@@ -56,5 +69,15 @@ public class Mercenaries {
 
     public void setDestinationNodeId(int nodeId) {
         destinationNodeId = nodeId;
+    }
+
+    public void setCurrentNode(MapNode node) {
+        currentNode = node;
+        currentRoad = null;
+    }
+
+    public void setCurrentRoad(MapRoad road) {
+        currentRoad = road;
+        currentNode = null;
     }
 }

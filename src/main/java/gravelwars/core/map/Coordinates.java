@@ -1,4 +1,4 @@
-package gravelwars.core;
+package gravelwars.core.map;
 
 public class Coordinates {
 

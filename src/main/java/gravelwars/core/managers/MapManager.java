@@ -1,6 +1,11 @@
-package gravelwars.core;
+package gravelwars.core.managers;
 
 import com.google.gson.Gson;
+import gravelwars.core.*;
+import gravelwars.core.data.MapData;
+import gravelwars.core.map.MapNode;
+import gravelwars.core.map.MapRoad;
+import gravelwars.core.map.Mercenaries;
 
 import java.io.*;
 import java.nio.file.*;
@@ -8,10 +13,11 @@ import java.util.*;
 
 public abstract class MapManager {
 
-    private static final Path gravelwarsPath = Path.of("gravel-wars.json");
-    private static MapDataLocal data;
+    private static final Path gravelwarsMapPath = Path.of("gravel-wars-map.json");
+    private static MapData data;
     private static final Timer worldTimer = new Timer();
     private final static LinkedList<MoveSquadOrder> moveSquadOrders = new LinkedList<>();
+    public final static HashMap<Integer, Mercenaries> mapMercenaries = new HashMap<>();
 
     public static void init() {
         // load from JSON or some other format to create the map
@@ -20,19 +26,24 @@ public abstract class MapManager {
         load();
         for (MapNode node : data.getNodes().values()) {
             node.init();
+            for (Mercenaries nodeMercenaries : node.getRedSquads().values()) {
+                mapMercenaries.put(nodeMercenaries.getId(), nodeMercenaries);
+            }
+            for (Mercenaries nodeMercenaries : node.getBlueSquads().values()) {
+                mapMercenaries.put(nodeMercenaries.getId(), nodeMercenaries);
+            }
         }
         for (MapRoad road : data.getRoads().values()) {
             road.init();
+            for (Mercenaries roadMercenaries : road.getNode1ToNode2()) {
+                mapMercenaries.put(roadMercenaries.getId(), roadMercenaries);
+            }
+            for (Mercenaries roadMercenaries : road.getNode2ToNode1()) {
+                mapMercenaries.put(roadMercenaries.getId(), roadMercenaries);
+            }
         }
         // generate the paths after the map is fully loaded
         generatePaths();
-        worldTimer.scheduleAtFixedRate(
-                new TimerTask() {
-                    @Override
-                    public void run() {
-                        tick();
-                    }
-                }, 100, 100);
     }
 
     private static void generatePaths() {
@@ -109,15 +120,24 @@ public abstract class MapManager {
         }
     }
 
+    public static void start() {
+        worldTimer.scheduleAtFixedRate(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        tick();
+                    }
+                }, 100, 100);
+    }
+
     public static void stop() {
         worldTimer.cancel();
-        save();
     }
 
     private static void load() {
         Gson gson = new Gson();
-        try (Reader reader = Files.newBufferedReader(gravelwarsPath)) {
-            data = gson.fromJson(reader, MapDataLocal.class);
+        try (Reader reader = Files.newBufferedReader(gravelwarsMapPath)) {
+            data = gson.fromJson(reader, MapData.class);
         } catch (IOException e) {
             if (e instanceof NoSuchFileException) {
                 generateWorld();
@@ -127,9 +147,9 @@ public abstract class MapManager {
         }
     }
 
-    private static void save() {
+    public static void save() {
         Gson gson = new Gson();
-        try (Writer writer = Files.newBufferedWriter(gravelwarsPath)) {
+        try (Writer writer = Files.newBufferedWriter(gravelwarsMapPath)) {
             String bussing = gson.toJson(data);
             System.out.println(bussing.length());
             writer.write(bussing);
@@ -139,7 +159,7 @@ public abstract class MapManager {
     }
 
     private static void generateWorld() {
-        data = new MapDataLocal(new LinkedHashMap<>(), new LinkedHashMap<>(), 0, 0, 0);
+        data = new MapData(new LinkedHashMap<>(), new LinkedHashMap<>(), 0, 0, 0);
         Random rng = new Random();
         int nodeCount = Math.floorMod(rng.nextInt(), 31) + 10;
         MapNode[] generatedNodes = new MapNode[nodeCount];
@@ -194,23 +214,19 @@ public abstract class MapManager {
         Mercenaries mercenaries = new Mercenaries(squadIndex, player, mercenariesClass);
         data.setSquadIndex(squadIndex + 1);
         switch (player.getTeam()) {
-            case RED -> {
-                getNodeById(data.getRedCapitalNodes().get(0)).addSquad(mercenaries);
-            }
-            case BLUE -> {
-                getNodeById(data.getBlueCapitalNodes().get(0)).addSquad(mercenaries);
-            }
+            case RED -> getNodeById(data.getRedCapitalNodes().get(0)).addSquad(mercenaries);
+            case BLUE -> getNodeById(data.getBlueCapitalNodes().get(0)).addSquad(mercenaries);
         }
+        mapMercenaries.put(mercenaries.getId(), mercenaries);
         return mercenaries;
     }
 
     public static boolean reinforceSquad(Mercenaries squad, int count) { // returns true if successful
-        int spawns = squad.getSpawns();
-        Enums.TFClass mercenariesClass = squad.getMercenariesClass();
-        if (spawns + count > Mercenaries.MAX_SPAWNS) { // prevent overflow
+        if (squad.canReinforce(count)) { // prevent overflow
             return false;
         }
         int costPerSpawn = 0;
+        Enums.TFClass mercenariesClass = squad.getMercenariesClass();
         switch (mercenariesClass) { // should declare constants later
             case SCOUT -> costPerSpawn = 2;
             case SOLDIER, PYRO -> costPerSpawn = 4;
@@ -240,13 +256,15 @@ public abstract class MapManager {
     private static void commitMoves() {
         for (MoveSquadOrder order : moveSquadOrders) {
             if (order.isNodeToRoad()) {
-                order.getNode().removeSquad(order.getSquad());
-                order.getRoad().addSquad(order.getSquad(), order.getNode());
-                order.getSquad().resetMoveProgress();
+                order.getNode().removeSquad(order.getSquad()); // remove the mercenaries from origin node
+                order.getRoad().addSquad(order.getSquad(), order.getNode()); // add the mercenaries to recipient road
+                order.getSquad().resetMoveProgress(); // reset squad move progress
+                order.getSquad().setCurrentRoad(order.getRoad()); // update reference to recipient road
             } else {
-                order.getRoad().removeSquad(order.getSquad());
-                order.getNode().addSquad(order.getSquad());
-                order.getSquad().resetMoveProgress();
+                order.getRoad().removeSquad(order.getSquad()); // remove the mercenaries from origin road
+                order.getNode().addSquad(order.getSquad()); // add the mercenaries to recipient node
+                order.getSquad().resetMoveProgress(); // reset squad move progress
+                order.getSquad().setCurrentNode(order.getNode()); // update reference to recipient road
             }
         }
         moveSquadOrders.clear();

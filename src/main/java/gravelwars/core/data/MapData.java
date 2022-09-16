@@ -1,11 +1,17 @@
-package gravelwars.core;
+package gravelwars.core.data;
+
+import gravelwars.core.Enums;
+import gravelwars.core.map.MapNode;
+import gravelwars.core.map.MapRoad;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-// extended version of MapData for storing the entire server locally and keeping track of IDs
-public class MapDataLocal extends MapData {
+// class used for storing the map structure and mercenaries
+public class MapData {
 
+    private HashMap<Integer, MapNode> nodes;
+    private HashMap<Integer, MapRoad> roads;
     private int nodeIndex; // used to give ids to new nodes
     private int roadIndex; // used to give ids to new roads
     private int squadIndex; // used to give ids to new squads
@@ -13,12 +19,13 @@ public class MapDataLocal extends MapData {
     private ArrayList<Integer> blueCapitalNodes;
     private ArrayList<Integer> unassignedCapitalNodes;
 
-    public MapDataLocal() {
-        super();
+    public MapData() {
+
     }
 
-    public MapDataLocal(HashMap<Integer, MapNode> nodes, HashMap<Integer, MapRoad> roads, int nodeIndex, int roadIndex, int squadIndex) {
-        super(nodes, roads);
+    public MapData(HashMap<Integer, MapNode> nodes, HashMap<Integer, MapRoad> roads, int nodeIndex, int roadIndex, int squadIndex) {
+        this.nodes = nodes;
+        this.roads = roads;
         this.nodeIndex = nodeIndex;
         this.roadIndex = roadIndex;
         this.squadIndex = squadIndex;
@@ -58,6 +65,22 @@ public class MapDataLocal extends MapData {
             case RED -> redCapitalNodes.add(mapNode.getId());
         }
         mapNode.setCapital(team);
+    }
+
+    public HashMap<Integer, MapNode> getNodes() {
+        return nodes;
+    }
+
+    public void setNodes(HashMap<Integer, MapNode> nodes) {
+        this.nodes = nodes;
+    }
+
+    public HashMap<Integer, MapRoad> getRoads() {
+        return roads;
+    }
+
+    public void setRoads(HashMap<Integer, MapRoad> roads) {
+        this.roads = roads;
     }
 
     public ArrayList<Integer> getRedCapitalNodes() {

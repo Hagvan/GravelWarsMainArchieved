@@ -1,5 +1,9 @@
 package gravelwars.core;
 
+import gravelwars.core.map.MapNode;
+import gravelwars.core.map.MapRoad;
+import gravelwars.core.map.Mercenaries;
+
 public class MoveSquadOrder {
 
     private final MapNode node;
